@@ -1,0 +1,62 @@
+# .github/workflows/docker_ci.yml
+
+name: Docker CI/CD (Build and Push)
+
+on:
+  # Disparar el flujo cuando se haga un push a la rama principal (main)
+  push:
+    branches: [ main ]
+  # Permitir la ejecución manual desde la interfaz de GitHub Actions
+  workflow_dispatch:
+
+jobs:
+  build_and_push:
+    # Usar un sistema operativo de Linux (runner)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        # Descarga tu código del repositorio
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        # Configura el constructor de Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into GitHub Container Registry (GHCR)
+        # Usa el secreto de GitHub para iniciar sesión en el registro
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USERNAME }}  # Tu usuario: lalavale064
+          password: ${{ secrets.GHCR_PAT }}       # Tu token: ghp_...
+          
+      # --- INICIO DEL SCRIPT DE AUTOMATIZACIÓN ---
+      - name: Build and Push Web Application Image
+        # Aquí se ejecuta la lógica del script que te proporcioné
+        run: |
+          # Variables
+          REGISTRY_USER="${{ secrets.GHCR_USERNAME }}"
+          APP_NAME="gestion-hotelera-web" 
+          
+          # 1. Obtener el hash de la versión (Tag)
+          IMAGE_TAG=$(git rev-parse --short HEAD)
+          FULL_APP_TAG="ghcr.io/$REGISTRY_USER/$APP_NAME:$IMAGE_TAG"
+          
+          # 2. Construir la imagen de la aplicación web
+          # Se construye desde el Dockerfile en la subcarpeta 'web'
+          docker build -t $FULL_APP_TAG ./web
+          
+          # 3. Subir la imagen al registro
+          docker push $FULL_APP_TAG
+          
+          echo "Imagen de la aplicación subida a: $FULL_APP_TAG"
+
+      - name: Run Docker Compose for Local Validation (Opcional)
+        # Solo para verificar que la DB y la App levanten juntas
+        run: |
+          echo "--- Validación local con Docker Compose ---"
+          docker compose up -d 
+          sleep 20 # Espera para el inicio de MySQL
+          docker compose ps
+          docker compose down

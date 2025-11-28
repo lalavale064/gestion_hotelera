@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8.0 # Usamos la imagen oficial de MySQL
+    container_name: hotel_db
+    restart: unless-stopped
+    environment:
+      # VARIABLES DE LA BASE DE DATOS
+      MYSQL_ROOT_PASSWORD: "" # ¡CAMBIA ESTO!
+      MYSQL_DATABASE: gestion_hotelera
+      MYSQL_USER: root
+      MYSQL_PASSWORD: "" # Usaremos esta para la app
+    ports:
+      - "3306:3306" # Opcional: para conectar un cliente externo
+    volumes:
+      # CRUCIAL: Ejecuta tu script SQL al levantar el contenedor por primera vez
+      - ./db_init/Hotel_BD.sql:/docker-entrypoint-initdb.d/Hotel_BD.sql
+      - db_data:/var/lib/mysql # Persistencia de datos para la DB
+    networks:
+      - hotel-net
+
+  web:
+    build: ./web # Construye la imagen usando el Dockerfile en la carpeta 'web'
+    container_name: hotel_web
+    restart: unless-stopped
+    ports:
+      - "3310:80" # Mapea 3310 (local) a 80 (contenedor)
+    environment:
+      # VARIABLES QUE LA APP UTILIZA PARA CONECTARSE A LA DB
+      DB_HOST: db                    # ¡El host es el nombre del servicio 'db'!
+      DB_PORT: 3306
+      DB_NAME: gestion_hotelera
+      DB_USER: root
+      DB_PASS: "" # Debe coincidir con la de la DB
+    depends_on:
+      - db # Asegura que la DB inicie antes que la Web
+    networks:
+      - hotel-net
+
+networks:
+  hotel-net:
+    driver: bridge
+
+volumes:
+  db_data: # Define el volumen de persistencia
