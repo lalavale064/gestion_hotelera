@@ -11,6 +11,7 @@ services:
       MYSQL_DATABASE: gestion_hotelera
       MYSQL_USER: root
       MYSQL_PASSWORD: "" # Usaremos esta para la app
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     ports:
       - "3307:3306" # Opcional: para conectar un cliente externo
     volumes:
