@@ -22,8 +22,8 @@ def get_conn():
     return pymysql.connect(host=DB_HOST, user=DB_USER, password=DB_PASS,
                            database=DB_NAME, port=DB_PORT, cursorclass=DictCursor,
                            autocommit=True,
-                           charset='utf8mb4',     # <-- CRUCIAL 1
-                           use_unicode=True)      # <-- CRUCIAL 2
+                           charset='utf8', # <-- CAMBIAR a 'utf8'
+                           use_unicode=True)
 
 def sha256_hex(s):
     # Función para generar el hash de la contraseña (debe coincidir con MySQL SHA2(s, 256))
