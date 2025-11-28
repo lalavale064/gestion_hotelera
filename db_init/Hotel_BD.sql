@@ -91,7 +91,7 @@ CREATE TABLE reservations (
   INDEX idx_guest_name (guest_name)
 ) ENGINE=InnoDB;
 
-/* Trigger para generar reservation_code automáticamente */
+/* Trigger para generar reservation_code automáticamente 
 DELIMITER $$
 CREATE TRIGGER trg_reservation_code 
 BEFORE INSERT ON reservations
@@ -101,7 +101,7 @@ BEGIN
         SET NEW.reservation_code = CONCAT('R-', SUBSTRING(UUID(), 1, 8));
     END IF;
 END$$
-DELIMITER ;
+DELIMITER ; */
 
 /* 7. SERVICIOS RESERVA */
 CREATE TABLE reservation_services (
