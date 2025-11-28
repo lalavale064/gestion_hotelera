@@ -12,7 +12,7 @@ services:
       MYSQL_USER: root
       MYSQL_PASSWORD: "" # Usaremos esta para la app
     ports:
-      - "3306:3306" # Opcional: para conectar un cliente externo
+      - "3307:3306" # Opcional: para conectar un cliente externo
     volumes:
       # CRUCIAL: Ejecuta tu script SQL al levantar el contenedor por primera vez
       - ./db_init/Hotel_BD.sql:/docker-entrypoint-initdb.d/Hotel_BD.sql
