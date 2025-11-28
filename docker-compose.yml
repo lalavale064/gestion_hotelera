@@ -2,16 +2,16 @@ version: "3.8"
 
 services:
   db:
-    image: mysql:8.0 # Usamos la imagen oficial de MySQL
+    image: mysql:8.0
     container_name: hotel_db
     restart: unless-stopped
     environment:
-      # VARIABLES DE LA BASE DE DATOS
-      MYSQL_ROOT_PASSWORD: "" # ¡CAMBIA ESTO!
+      # CRUCIAL: Configura la contraseña del usuario root (vacía)
+      MYSQL_ROOT_PASSWORD: "" 
+      # CRUCIAL: Permite explícitamente la contraseña vacía para el root
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes' 
+      # Configura el nombre de la DB a crear
       MYSQL_DATABASE: gestion_hotelera
-      MYSQL_USER: root
-      MYSQL_PASSWORD: "" # Usaremos esta para la app
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     ports:
       - "3307:3306" # Opcional: para conectar un cliente externo
     volumes:
