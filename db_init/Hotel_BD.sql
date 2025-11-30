@@ -1,5 +1,5 @@
 /* =========================================================
-   BASE DE DATOS: GESTIÓN HOTELERA (OPTIMIZADA)
+   BASE DE DATOS: GESTIÓN HOTELERA 
    ========================================================= */
 
 DROP DATABASE IF EXISTS gestion_hotelera;
@@ -129,7 +129,6 @@ CREATE TABLE invoices (
 
 /* =========================================================
    Añadir columna service_date a reservation_services sólo si no existe
-   (compatible incluso con versiones de MariaDB que no soporten
    "ADD COLUMN IF NOT EXISTS")
    ========================================================= */
 
@@ -152,7 +151,7 @@ EXECUTE alter_stmt;
 DEALLOCATE PREPARE alter_stmt;
 
 /* =========================================================
-   DATOS SEMILLA CORREGIDOS PARA EL ESQUEMA OPTIMIZADO
+   CORRECCIONES (para los demás roles)
    ========================================================= */
 
 /* 1. USUARIOS (Se asume que los primeros 3 ya tienen IDs 1, 2 y 3) */
