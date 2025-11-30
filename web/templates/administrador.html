@@ -40,6 +40,7 @@
             flex-direction: column;
             padding: 20px;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.02);
+            overflow-y: auto;
         }
 
         .logo {
@@ -368,6 +369,10 @@
                     style="background:white; padding:5px 15px; border-radius:20px; font-size:14px; border:1px solid #eee;">
                     👤 <span id="user-role-display">Rol</span>
                 </span>
+                <button onclick="logout()"
+                    style="background:var(--danger); color:white; border:none; padding:8px 15px; border-radius:20px; cursor:pointer; font-size:12px; font-weight:bold;">
+                    🚪 Salir
+                </button>
             </div>
         </header>
 
