@@ -246,3 +246,7 @@ INSERT INTO invoices (reservation_id, total, invoice_date, method) VALUES
 (3, 600.00, '2025-03-05', 'transferencia'),
 (5, 500.00, '2025-05-20', 'tarjeta');
 
+UPDATE reservations 
+SET reservation_code = CONCAT('R-', LPAD(reservation_id, 8, '0'))
+WHERE reservation_code IS NULL;
+
