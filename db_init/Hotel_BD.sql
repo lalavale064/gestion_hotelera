@@ -232,7 +232,7 @@ INSERT INTO reservations (client_id, room_id, guest_name, guest_email, checkin_d
 (6, 5, 'Valeria Hernández', 'valeria.h@example.com', '2025-05-20', '2025-05-25', 500.00, 'reservada');
 
 
-/* 7. SERVICIOS RESERVA (Ejemplo de servicio aplicado a la Reserva ID 2 (Luis)) */
+/* 7. SERVICIOS RESERVA (Ejemplo de servicio aplicado a la Reserva ID 2) */
 -- Se asume ID de servicio 3 (Desayuno buffet, $30) y 2 (Masaje relajante, $120)
 INSERT INTO reservation_services (reservation_id, service_id, quantity, unit_price, service_date) VALUES
 (2, 3, 2, 30.00, '2025-02-06'), -- Desayuno para dos el 06-Feb
@@ -245,6 +245,24 @@ INSERT INTO invoices (reservation_id, total, invoice_date, method) VALUES
 (2, 280.00, '2025-02-07', 'efectivo'), -- Total: 160 (Reserva) + 60 (2 Desayunos) + 120 (Masaje) = 340. Usaremos 280 para simular algún descuento o error.
 (3, 600.00, '2025-03-05', 'transferencia'),
 (5, 500.00, '2025-05-20', 'tarjeta');
+
+
+/* Ajuste de códigos de factura*/
+DELIMITER $$
+CREATE TRIGGER trg_invoice_code 
+BEFORE INSERT ON invoices
+FOR EACH ROW 
+BEGIN
+    IF NEW.invoice_code IS NULL OR NEW.invoice_code = '' THEN
+        SET NEW.invoice_code = CONCAT('INV-', DATE_FORMAT(NOW(), '%Y%m%d'), '-', LPAD(NEW.invoice_id, 4, '0'));
+    END IF;
+END$$
+DELIMITER ;
+
+
+UPDATE invoices 
+SET invoice_code = CONCAT('INV-', DATE_FORMAT(invoice_date, '%Y%m%d'), '-', LPAD(invoice_id, 4, '0'))
+WHERE invoice_code IS NULL;
 
 UPDATE reservations 
 SET reservation_code = CONCAT('R-', LPAD(reservation_id, 8, '0'))
