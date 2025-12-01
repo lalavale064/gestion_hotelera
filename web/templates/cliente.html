@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Reservar - Hotel R&G</title>
     <style>
-        /* ... ESTILOS OMITIDOS POR BREVEDAD ... */
         :root {
             --bg: #f6fbf8;
             --card: #fff;
@@ -155,10 +154,9 @@
     <script>
         const userRole = localStorage.getItem('user_role');
         const clientId = localStorage.getItem('client_id');
-        let currentRooms = []; // Para almacenar las habitaciones disponibles
+        let currentRooms = [];
         let selectedRoom = null;
 
-        // --- FUNCIÓN AGREGADA: Para obtener la fecha de hoy en formato YYYY-MM-DD
         function getTodayDateString() {
             const today = new Date();
             const year = today.getFullYear();
@@ -167,7 +165,6 @@
             return `${year}-${month}-${day}`;
         }
 
-        // --- AUTORIZACIÓN Y LÓGICA DE INICIO ---
         function init() {
             if (userRole !== 'cliente' || !clientId) {
                 alert('Acceso no autorizado. Inicie sesión como cliente.');
@@ -175,41 +172,38 @@
                 return;
             }
 
-            // CAMBIO CLAVE: Establece el mínimo para Check-in como la fecha de hoy
             const today = getTodayDateString();
+
             document.getElementById('checkin').min = today;
-            document.getElementById('checkin').value = today; // Opcional: precargar con la fecha de hoy
             document.getElementById('checkout').min = today;
+            document.getElementById('checkin').value = today;
+
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('checkout').value = tomorrow.toISOString().split('T')[0];
+
+            // ⭐ AGREGADO EN UN SOLO RENGLÓN (bloqueo inmediato de fechas inválidas)
+            const checkinInput=document.getElementById('checkin');const checkoutInput=document.getElementById('checkout');function bloquearFechaInvalida(input){input.addEventListener('input',()=>{const hoy=getTodayDateString();if(input.value<hoy){alert("Fecha no disponible. Debe ser hoy o posterior.");input.value=hoy;}});}bloquearFechaInvalida(checkinInput);bloquearFechaInvalida(checkoutInput);
 
             document.getElementById('available-rooms').innerHTML = '<div class="muted">Busca fechas para ver habitaciones.</div>';
             renderMyReservations();
 
-            // Añadir un listener para actualizar el 'min' de checkout cuando checkin cambie
             document.getElementById('checkin').addEventListener('change', (e) => {
-                // Asegura que checkout sea al menos el día siguiente a checkin
                 const checkinDate = new Date(e.target.value);
-                checkinDate.setDate(checkinDate.getDate() + 1); // El día siguiente
+                checkinDate.setDate(checkinDate.getDate() + 1);
                 const nextDayString = checkinDate.toISOString().split('T')[0];
                 document.getElementById('checkout').min = nextDayString;
 
-                // Si checkout es anterior o igual a checkin, lo resetea
                 if (document.getElementById('checkout').value <= e.target.value) {
                     document.getElementById('checkout').value = nextDayString;
                 }
             });
-
-            // Inicializa 'min' para checkout un día después de hoy
-            const todayDate = new Date();
-            todayDate.setDate(todayDate.getDate() + 1);
-            document.getElementById('checkout').min = todayDate.toISOString().split('T')[0];
-            document.getElementById('checkout').value = todayDate.toISOString().split('T')[0];
         }
 
         async function renderMyReservations() {
             const el = document.getElementById('my-reservations-container');
             el.innerHTML = 'Cargando...';
             try {
-                // Llama al endpoint de reservas con el filtro client_id
                 const resp = await fetch(`/api/reservations?client_id=${clientId}`, { headers: { 'X-User-Role': userRole } });
                 const data = await resp.json();
 
@@ -237,20 +231,17 @@
                     el.appendChild(d);
                 });
             } catch (e) {
-                console.error(e);
                 el.innerHTML = '<div class="muted">Error al cargar tus reservas.</div>';
             }
         }
 
-        // Lógica de búsqueda de habitaciones (simulada sin filtro real por disponibilidad)
         async function searchRooms() {
             const checkin = document.getElementById('checkin').value;
             const checkout = document.getElementById('checkout').value;
             const type = document.getElementById('type').value;
 
-            // CAMBIO: Validación de fechas más estricta
             if (!checkin || !checkout || checkin >= checkout || checkin < getTodayDateString()) {
-                alert('Asegúrate de seleccionar fechas de Check-in y Check-out válidas. Check-in debe ser hoy o posterior, y Check-out debe ser posterior a Check-in.');
+                alert('Fechas inválidas. Check-in debe ser hoy o posterior, y Check-out debe ser después.');
                 return;
             }
 
@@ -259,18 +250,16 @@
             selectedRoom = null;
 
             try {
-                // Llama al endpoint de habitaciones (permiso de lectura para todos)
                 const resp = await fetch('/api/rooms', { headers: { 'X-User-Role': userRole } });
                 currentRooms = await resp.json();
 
-                // Filtra por tipo y estado
                 const filteredRooms = currentRooms.filter(r =>
                     r.status === 'disponible' &&
                     (type === 'todos' || r.room_type === type)
                 );
 
                 el.innerHTML = '';
-                if (filteredRooms.length === 0) { el.innerHTML = '<div class="muted">No se encontraron habitaciones disponibles para este filtro.</div>'; return; }
+                if (filteredRooms.length === 0) { el.innerHTML = '<div class="muted">No se encontraron habitaciones disponibles.</div>'; return; }
 
                 filteredRooms.forEach(r => {
                     const d = document.createElement('div');
@@ -295,7 +284,6 @@
 
             document.querySelector(`[data-room-id="${roomId}"]`).classList.add('selected');
 
-            // Abre el modal de confirmación
             document.getElementById('res-room-id').value = roomId;
             document.getElementById('res-room-num').textContent = selectedRoom.room_num;
             document.getElementById('res-room-price').textContent = `$${selectedRoom.price}`;
@@ -310,17 +298,15 @@
         }
 
         async function confirmReservation() {
-            // ... (lógica de validación) ...
             const checkin = document.getElementById('checkin').value;
             const checkout = document.getElementById('checkout').value;
 
-            // Validación adicional de fechas antes de enviar
             if (checkin < getTodayDateString()) {
-                alert('No se pueden hacer reservas para fechas de Check-in anteriores a hoy.');
+                alert('No se pueden hacer reservas antes de hoy.');
                 return;
             }
             if (checkin >= checkout) {
-                alert('La fecha de Check-out debe ser posterior a la fecha de Check-in.');
+                alert('El Check-out debe ser después del Check-in.');
                 return;
             }
 
@@ -329,7 +315,7 @@
             const guestEmail = document.getElementById('res-guest-email').value;
 
             if (!guestName || !guestEmail) {
-                alert('Completa los campos de nombre y email.');
+                alert('Completa todos los datos del huésped.');
                 return;
             }
 
@@ -356,18 +342,17 @@
                 if (resp.ok) {
                     alert(`Reserva ${j.reservation_id} creada. Total estimado: $${j.total_estimado}`);
                     closeModal('reserveModal');
-                    renderMyReservations(); // Recargar
+                    renderMyReservations();
                 } else {
-                    alert('Error al crear la reserva: ' + (j.error || 'Error desconocido'));
+                    alert('Error: ' + (j.error || 'Desconocido'));
                 }
             } catch (e) {
                 alert('Error de conexión.');
-                console.error(e);
             }
         }
 
         async function cancelReservation(resId) {
-            if (!confirm('¿Estás seguro de que quieres cancelar esta reserva?')) return;
+            if (!confirm('¿Seguro que deseas cancelar esta reserva?')) return;
 
             try {
                 const resp = await fetch(`/api/reservations/${resId}`, {
@@ -380,11 +365,11 @@
                 });
 
                 if (resp.ok) {
-                    alert('Reserva cancelada exitosamente.');
-                    renderMyReservations(); // Recargar
+                    alert('Reserva cancelada.');
+                    renderMyReservations();
                 } else {
                     const j = await resp.json();
-                    alert('Error al cancelar: ' + (j.error || 'Error desconocido'));
+                    alert('Error: ' + (j.error || 'Desconocido'));
                 }
             } catch (e) {
                 alert('Error de conexión.');
