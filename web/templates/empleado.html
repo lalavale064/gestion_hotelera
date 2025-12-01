@@ -57,11 +57,37 @@
             display: block;
         }
 
+        /* TABS - MEJORA */
+        .tab-btn {
+            background: none;
+            color: var(--muted);
+            border: 1px solid transparent;
+            border-bottom: 3px solid transparent;
+            padding: 8px 16px;
+            margin-right: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom: 3px solid var(--accent);
+        }
+
         /* TABLES */
+        .table-responsive {
+            overflow-x: auto;
+            /* Permite scroll horizontal en móviles */
+            width: 100%;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            min-width: 600px;
+            /* Mínimo para asegurar espacio */
         }
 
         th,
@@ -194,27 +220,34 @@
             <button class="danger" onclick="logout()">Cerrar Sesión</button>
         </header>
 
-        <!-- VISTA RECEPCIÓN -->
+        <div id="tabs" style="margin-bottom: 20px; display:none;">
+            <button id="tab-recepcion" class="tab-btn active">Recepción</button>
+            <button id="tab-spa" class="tab-btn">SPA/Servicios</button>
+        </div>
+
+
         <div id="view-recepcion" class="section">
             <div class="card">
                 <h2>Operaciones Diarias (Check-in / Check-out)</h2>
-                <table id="daily-ops-table">
-                    <thead>
-                        <tr>
-                            <th>Reserva</th>
-                            <th>Huésped</th>
-                            <th>Habitación</th>
-                            <th>Fechas</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="6">Cargando...</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table id="daily-ops-table">
+                        <thead>
+                            <tr>
+                                <th>Reserva</th>
+                                <th>Huésped</th>
+                                <th>Habitación</th>
+                                <th>Fechas</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="6">Cargando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="card">
@@ -223,7 +256,6 @@
             </div>
         </div>
 
-        <!-- VISTA SPA -->
         <div id="view-spa" class="section">
             <div class="card">
                 <h2>Huéspedes en Casa (Activos)</h2>
@@ -231,22 +263,24 @@
                     <input type="text" id="in-house-search" placeholder="Buscar por huésped o habitación..."
                         onkeyup="debounceSearch('in-house', this.value)" style="max-width:300px;">
                 </div>
-                <table id="in-house-table">
-                    <thead>
-                        <tr>
-                            <th>Habitación</th>
-                            <th>Huésped</th>
-                            <th>Fechas</th>
-                            <th>Reserva</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="5">Cargando...</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table id="in-house-table">
+                        <thead>
+                            <tr>
+                                <th>Habitación</th>
+                                <th>Huésped</th>
+                                <th>Fechas</th>
+                                <th>Reserva</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5">Cargando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="card">
@@ -255,23 +289,25 @@
                     <input type="text" id="srv-history-search" placeholder="Buscar por cliente, servicio..."
                         onkeyup="debounceSearch('srv-history', this.value)" style="max-width:300px;">
                 </div>
-                <table id="srv-history-table">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Servicio</th>
-                            <th>Huésped / Hab.</th>
-                            <th>Cant.</th>
-                            <th>Total</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="6">Cargando...</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table id="srv-history-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Servicio</th>
+                                <th>Huésped / Hab.</th>
+                                <th>Cant.</th>
+                                <th>Total</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="6">Cargando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="card">
@@ -282,7 +318,6 @@
 
     </div>
 
-    <!-- MODAL CARGAR SERVICIO (SPA) -->
     <div id="serviceModal" class="modal">
         <div class="modal-content">
             <h3>Cargar Servicio</h3>
@@ -309,7 +344,6 @@
         </div>
     </div>
 
-    <!-- MODAL EDITAR SERVICIO (SPA) -->
     <div id="serviceEditModal" class="modal">
         <div class="modal-content">
             <h3>Editar Servicio</h3>
@@ -336,6 +370,28 @@
         const userRole = localStorage.getItem('user_role');
         const allowedRoles = ['recepcion', 'spa', 'admin'];
 
+        // --- GENERAL HELPERS ---
+
+        // Función para obtener la fecha de hoy en formato YYYY-MM-DD
+        function getTodayDateString() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Manejador de vistas para Admin
+        function switchView(view) {
+            document.getElementById('view-recepcion').classList.remove('active');
+            document.getElementById('view-spa').classList.remove('active');
+            document.getElementById(`view-${view}`).classList.add('active');
+
+            document.getElementById('tab-recepcion').classList.remove('active');
+            document.getElementById('tab-spa').classList.remove('active');
+            document.getElementById(`tab-${view}`).classList.add('active');
+        }
+
         // --- INIT ---
         function init() {
             if (!userRole || !allowedRoles.includes(userRole)) {
@@ -344,24 +400,35 @@
             }
 
             document.getElementById('role-title').textContent = userRole.toUpperCase();
+            document.title = `Panel ${userRole.toUpperCase()} | Hotel R&G`; // Mejora UX
 
-            // Mostrar vista según rol
-            if (userRole === 'recepcion' || userRole === 'admin') {
+            const today = getTodayDateString();
+            document.getElementById('srv-date').min = today;
+            document.getElementById('edit-srv-date').min = today;
+
+            // Lógica para mostrar vista según rol
+            if (userRole === 'recepcion') {
                 document.getElementById('view-recepcion').classList.add('active');
                 loadDailyOps();
                 loadRooms();
-            }
+            } else if (userRole === 'spa') {
+                document.getElementById('view-spa').classList.add('active');
+                loadInHouseGuests();
+                loadServiceReservations();
+                loadServicesCatalog();
+            } else if (userRole === 'admin') {
+                // Admin: Mostrar pestañas y cargar todo
+                document.getElementById('tabs').style.display = 'flex';
+                document.getElementById('view-recepcion').classList.add('active'); // Default view
 
-            if (userRole === 'spa' || userRole === 'admin') {
-                // Si es admin mostramos ambos, o podríamos hacer pestañas. 
-                // Para simplificar, si es admin mostramos recepcion por defecto, 
-                // pero si es SPA mostramos SPA.
-                if (userRole === 'spa') {
-                    document.getElementById('view-spa').classList.add('active');
-                    loadInHouseGuests();
-                    loadServiceReservations(); // Load history
-                    loadServicesCatalog();
-                }
+                document.getElementById('tab-recepcion').addEventListener('click', () => switchView('recepcion'));
+                document.getElementById('tab-spa').addEventListener('click', () => switchView('spa'));
+
+                loadDailyOps();
+                loadRooms();
+                loadInHouseGuests();
+                loadServiceReservations();
+                loadServicesCatalog();
             }
         }
 
@@ -400,25 +467,33 @@
                         </td>
                     </tr>
                 `).join('');
-            } catch (e) { tbody.innerHTML = '<tr><td colspan="6">Error al cargar datos.</td></tr>'; }
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="6">Error al cargar datos.</td></tr>';
+            }
         }
 
+        // LÓGICA CORREGIDA para Check-in / Check-out (Asume que el endpoint /api/reservations/{id} soporta la actualización de STATUS)
         async function updateStatus(id, status) {
-            if (!confirm(`¿Cambiar estado a ${status}?`)) return;
+            if (!confirm(`¿Cambiar estado a ${status.toUpperCase()}?`)) return;
             try {
-                // Usamos el endpoint genérico de update reservation (parcial)
-                // Nota: En app.py api_update_reservation maneja PUT completo. 
-                // Deberíamos tener un endpoint PATCH o manejar el PUT con cuidado.
-                // Por ahora, asumimos que el backend maneja actualización de estado si se envía solo eso,
-                // OJO: api_update_reservation en app.py espera todos los campos.
-                // FIX: Usaremos el endpoint de cancel que es un PUT de estado, pero generalizado?
-                // No, mejor crear un endpoint específico o usar el de admin si permite partial updates.
-                // Revisando app.py: api_update_reservation hace UPDATE reservations SET ... con todos los campos.
-                // ESTO ES UN PROBLEMA. Necesitamos un endpoint para cambiar estado solamente.
-                // WORKAROUND: Usar el endpoint de cancel que modificamos? No, ese pone 'cancelada'.
-                // SOLUCIÓN RÁPIDA: Alertar que esta función requiere admin por ahora o implementar endpoint.
-                alert("Funcionalidad de cambio de estado pendiente de endpoint específico.");
-            } catch (e) { alert("Error"); }
+                // Usa el endpoint PUT y envía solo el estado. El backend debe manejar esto.
+                const resp = await fetchAPI(`/api/reservations/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ status: status })
+                });
+
+                const j = await resp.json();
+
+                if (resp.ok) {
+                    alert(`Reserva ${id} actualizada a ${status}.`);
+                    loadDailyOps(); // Recargar la tabla
+                    loadRooms(); // Recargar el estado de las habitaciones
+                } else {
+                    alert("Error: " + (j.error || 'No se pudo actualizar el estado.'));
+                }
+            } catch (e) {
+                alert("Error de conexión al intentar cambiar el estado.");
+            }
         }
 
         async function loadRooms() {
@@ -434,11 +509,14 @@
                         <div style="font-size:12px; margin-top:4px">${r.status}</div>
                     </div>
                 `).join('');
-            } catch (e) { grid.innerHTML = 'Error al cargar habitaciones.'; }
+            } catch (e) {
+                grid.innerHTML = 'Error al cargar habitaciones.';
+            }
         }
 
         // --- SPA LOGIC ---
         let debounceTimer;
+
         function debounceSearch(type, value) {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
@@ -468,13 +546,14 @@
                         <td><button onclick="openServiceModal(${r.reservation_id}, '${r.guest_name}', '${r.room_num}')">Cargar Servicio</button></td>
                     </tr>
                 `).join('');
-            } catch (e) { tbody.innerHTML = '<tr><td colspan="5">Error.</td></tr>'; }
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="5">Error.</td></tr>';
+            }
         }
 
         async function loadServiceReservations(search = '') {
             const tbody = document.querySelector('#srv-history-table tbody');
             try {
-                // Usamos el endpoint existente que soporta búsqueda
                 const url = `/api/reservation_services?per_page=20&q=${encodeURIComponent(search)}`;
                 const resp = await fetchAPI(url);
                 const result = await resp.json();
@@ -498,17 +577,19 @@
                         </td>
                     </tr>
                 `).join('');
-            } catch (e) { tbody.innerHTML = '<tr><td colspan="6">Error al cargar historial.</td></tr>'; }
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="6">Error al cargar historial.</td></tr>';
+            }
         }
 
         async function loadServicesCatalog() {
             const div = document.getElementById('services-catalog');
             try {
-                const resp = await fetchAPI('/api/services?per_page=100'); // Fetch more services
+                // Asume que la API puede manejar un límite grande o devuelve todo
+                const resp = await fetchAPI('/api/services?per_page=100');
                 const result = await resp.json();
-                const data = result.data || []; // Handle paginated response
+                const data = result.data || [];
 
-                // Guardamos servicios para el select del modal
                 const select = document.getElementById('srv-select');
                 select.innerHTML = data.map(s => `<option value="${s.service_id}">${s.name} - $${s.price}</option>`).join('');
 
@@ -517,14 +598,17 @@
                         <strong>${s.name}</strong> ($${s.price})
                     </div>
                 `).join('');
-            } catch (e) { div.innerHTML = 'Error.'; }
+            } catch (e) {
+                div.innerHTML = 'Error.';
+            }
         }
 
         function openServiceModal(resId, guestName, roomNum) {
             document.getElementById('srv-res-id').value = resId;
             document.getElementById('srv-guest-name').textContent = guestName;
             document.getElementById('srv-room-num').textContent = roomNum;
-            document.getElementById('srv-date').valueAsDate = new Date();
+            document.getElementById('srv-qty').value = 1; // Resetear cantidad
+            document.getElementById('srv-date').value = getTodayDateString(); // Establecer fecha de hoy
             document.getElementById('serviceModal').style.display = 'flex';
         }
 
@@ -546,7 +630,10 @@
             const qty = document.getElementById('srv-qty').value;
             const date = document.getElementById('srv-date').value;
 
-            if (!date || !qty) { alert("Complete los campos"); return; }
+            if (!date || !qty || parseInt(qty) < 1) {
+                alert("Complete los campos correctamente.");
+                return;
+            }
 
             try {
                 const resp = await fetchAPI(`/api/reservations/${resId}/services`, {
@@ -562,11 +649,14 @@
                     alert("Servicio cargado exitosamente.");
                     closeModal('serviceModal');
                     loadServiceReservations(); // Actualizar historial
+                    loadInHouseGuests(document.getElementById('in-house-search').value); // Recargar huéspedes
                 } else {
                     const j = await resp.json();
-                    alert("Error: " + j.error);
+                    alert("Error: " + (j.error || 'Error desconocido al cargar servicio.'));
                 }
-            } catch (e) { alert("Error de conexión"); }
+            } catch (e) {
+                alert("Error de conexión");
+            }
         }
 
         async function submitServiceUpdate() {
@@ -574,12 +664,18 @@
             const qty = document.getElementById('edit-srv-qty').value;
             const date = document.getElementById('edit-srv-date').value;
 
-            if (!date || !qty) { alert("Complete los campos"); return; }
+            if (!date || !qty || parseInt(qty) < 1) {
+                alert("Complete los campos correctamente.");
+                return;
+            }
 
             try {
                 const resp = await fetchAPI(`/api/reservation_services/${id}`, {
                     method: 'PUT',
-                    body: JSON.stringify({ quantity: qty, service_date: date })
+                    body: JSON.stringify({
+                        quantity: qty,
+                        service_date: date
+                    })
                 });
 
                 if (resp.ok) {
@@ -587,22 +683,30 @@
                     closeModal('serviceEditModal');
                     loadServiceReservations();
                 } else {
-                    alert("Error al actualizar");
+                    const j = await resp.json();
+                    alert("Error al actualizar: " + (j.error || 'Error desconocido.'));
                 }
-            } catch (e) { alert("Error de conexión"); }
+            } catch (e) {
+                alert("Error de conexión");
+            }
         }
 
         async function deleteServiceReservation(id) {
             if (!confirm("¿Eliminar este servicio?")) return;
             try {
-                const resp = await fetchAPI(`/api/reservation_services/${id}`, { method: 'DELETE' });
+                const resp = await fetchAPI(`/api/reservation_services/${id}`, {
+                    method: 'DELETE'
+                });
                 if (resp.ok) {
                     alert("Servicio eliminado.");
                     loadServiceReservations();
                 } else {
-                    alert("Error al eliminar");
+                    const j = await resp.json();
+                    alert("Error al eliminar: " + (j.error || 'Error desconocido.'));
                 }
-            } catch (e) { alert("Error de conexión"); }
+            } catch (e) {
+                alert("Error de conexión");
+            }
         }
 
         function logout() {
