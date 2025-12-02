@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Portal Cliente - Hotel R&G</title>
+    <style>
+        :root {
+            --bg: #f6fbf8;
+            --card: #fff;
+            --accent: #3fbf7f;
+            --accent-hover: #35a56d;
+            --muted: #6b7280;
+            --danger: #ff6b6b;
+            --border: #e9f0ec;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, Arial;
+            background: var(--bg);
+            color: #072018;
+        }
+
+        .wrap {
+            max-width: 980px;
+            margin: 28px auto;
+            padding: 18px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--muted);
+            font-size: 16px;
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--card);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        /* FORMS & INPUTS */
+        .row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: var(--accent);
+            color: white;
+            border: 0;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: var(--accent-hover);
+        }
+
+        button.danger {
+            background: var(--danger);
+        }
+
+        button.secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        /* TABLES & LISTS */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .res-item {
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .res-info strong {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .res-info span {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-reservada {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .status-confirmada {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-cancelada {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-checkin {
+            background: #fef9c3;
+            color: #ca8a04;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="wrap">
+        <header>
+            <h1>Portal Cliente</h1>
+            <button class="danger" onclick="logout()">Cerrar Sesión</button>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('reservas')">Mis Reservas</button>
+            <button class="tab-btn" onclick="switchTab('consumo')">Consumo de Servicios</button>
+            <button class="tab-btn" onclick="switchTab('disponibilidad')">Nueva Reserva</button>
+        </div>
+
+        <!-- TAB: MIS RESERVAS -->
+        <div id="tab-reservas" class="tab-content active">
+            <div class="card">
+                <h2>Historial de Reservas</h2>
+                <div id="my-reservations-list">Cargando...</div>
+            </div>
+        </div>
+
+        <!-- MODAL: SOLICITAR SERVICIO -->
+        <div id="serviceRequestModal" class="modal">
+            <div class="modal-content">
+                <h3>Solicitar Servicio</h3>
+                <p><strong>Reserva:</strong> <span id="srv-req-res-code"></span></p>
+                <input type="hidden" id="srv-req-res-id">
+                <input type="hidden" id="srv-req-checkin">
+                <input type="hidden" id="srv-req-checkout">
+
+                <div class="form-group">
+                    <label>Servicio</label>
+                    <select id="srv-req-service" class="form-control">
+                        <option value="">Cargando...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Fecha del Servicio</label>
+                    <input type="date" id="srv-req-date" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>Cantidad</label>
+                    <input type="number" id="srv-req-qty" class="form-control" value="1" min="1">
+                </div>
+
+                <div class="modal-footer">
+                    <button class="secondary" onclick="closeModal('serviceRequestModal')">Cancelar</button>
+                    <button onclick="submitServiceRequest()">Solicitar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CONSUMO -->
+        <div id="tab-consumo" class="tab-content">
+            <div class="card">
+                <h2>Servicios Consumidos</h2>
+                <p class="muted">Detalle de servicios cargados a sus habitaciones.</p>
+                <div style="overflow-x: auto;">
+                    <table id="services-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Servicio</th>
+                                <th>Reserva</th>
+                                <th>Cant.</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5">Cargando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: DISPONIBILIDAD -->
+        <div id="tab-disponibilidad" class="tab-content">
+            <div class="card">
+                <h2>Buscar Disponibilidad</h2>
+                <div class="row">
+                    <div class="col"><label>Check-in</label><input type="date" id="search-checkin"></div>
+                    <div class="col"><label>Check-out</label><input type="date" id="search-checkout"></div>
+                    <div class="col"><label>Tipo</label>
+                        <select id="search-type">
+                            <option value="todos">Todos</option>
+                            <option value="sencilla">Sencilla</option>
+                            <option value="doble">Doble</option>
+                            <option value="suite">Suite</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="searchRooms()">Buscar Habitaciones</button>
+            </div>
+            <div id="rooms-results"></div>
+        </div>
+
+    </div>
+
+    <!-- MODAL CONFIRMAR RESERVA -->
+    <div id="reserveModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirmar Reserva</h3>
+            <p><strong>Habitación:</strong> <span id="res-room-info"></span></p>
+            <p><strong>Fechas:</strong> <span id="res-dates-info"></span></p>
+
+            <label>Nombre del Huésped</label>
+            <input type="text" id="res-guest-name" required>
+
+            <label>Email de Contacto</label>
+            <input type="email" id="res-guest-email" required>
+
+            <label>Teléfono</label>
+            <input type="tel" id="res-guest-phone" pattern="[0-9]+" placeholder="Solo números">
+
+            <input type="hidden" id="res-room-id">
+
+            <div class="modal-footer">
+                <button class="secondary" onclick="closeModal('reserveModal')">Cancelar</button>
+                <button onclick="confirmReservation()">Confirmar Reserva</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const userRole = localStorage.getItem('user_role');
+        const clientId = localStorage.getItem('client_id');
+        let currentRooms = [];
+
+        // --- INIT ---
+        function init() {
+            if (userRole !== 'cliente' || !clientId) {
+                window.location.href = './login.html';
+                return;
+            }
+            loadMyReservations();
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+
+            if (tabName === 'reservas') loadMyReservations();
+            if (tabName === 'consumo') loadMyServices();
+        }
+
+        // --- API CALLS ---
+        async function fetchWithAuth(url, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-User-Role': userRole,
+                'X-Client-Id': clientId,
+                ...options.headers
+            };
+            return fetch(url, { ...options, headers });
+        }
+
+        // --- MIS RESERVAS ---
+        async function loadMyReservations() {
+            const el = document.getElementById('my-reservations-list');
+            try {
+                const resp = await fetchWithAuth('/api/my_reservations');
+                const data = await resp.json();
+
+                if (data.length === 0) {
+                    el.innerHTML = '<p class="muted">No tienes reservas registradas.</p>';
+                    return;
+                }
+
+                el.innerHTML = data.map(r => {
+                    let actions = '';
+                    if (r.status !== 'cancelada' && r.status !== 'facturada') {
+                        actions += `<button class="danger" style="padding:6px 12px; margin-top:8px; font-size:12px" onclick="cancelReservation(${r.reservation_id})">Cancelar Reserva</button>`;
+                    }
+                    // Agregar botón Solicitar Servicio si la reserva está activa
+                    if (['reservada', 'confirmada', 'checkin'].includes(r.status)) {
+                        actions += ` <button class="secondary" style="padding:6px 12px; margin-top:8px; font-size:12px" onclick="openServiceRequestModal(${r.reservation_id}, '${r.reservation_code}', '${r.checkin_date}', '${r.checkout_date}')">Solicitar Servicio</button>`;
+                    }
+                    return `
+                    <div class="res-item">
+                        <div class="res-info">
+                            <strong>${r.room_type.toUpperCase()} - Hab. ${r.room_num}</strong>
+                            <span>${r.checkin_date} al ${r.checkout_date} • Código: ${r.reservation_code}</span>
+                        </div>
+                        <div style="text-align:right">
+                            <span class="status-badge status-${r.status}">${r.status}</span>
+                            <div style="margin-top:8px; font-weight:bold">$${r.total}</div>
+                            ${actions}
+                        </div>
+                    </div>
+                `;
+                }).join('');
+            } catch (e) {
+                el.innerHTML = '<p class="danger">Error al cargar reservas.</p>';
+            }
+        }
+
+        async function cancelReservation(id) {
+            if (!confirm("¿Seguro que deseas cancelar esta reserva?")) return;
+            try {
+                const resp = await fetchWithAuth(`/api/reservations/${id}/cancel`, { method: 'PUT' });
+                if (resp.ok) {
+                    alert("Reserva cancelada.");
+                    loadMyReservations();
+                } else {
+                    const j = await resp.json();
+                    alert("Error: " + j.error);
+                }
+            } catch (e) { alert("Error de conexión"); }
+        }
+
+        // --- CONSUMO SERVICIOS ---
+        async function loadMyServices() {
+            const tbody = document.querySelector('#services-table tbody');
+            try {
+                const resp = await fetchWithAuth('/api/my_reservation_services');
+                const data = await resp.json();
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">No hay consumos registrados.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = data.map(s => `
+                    <tr>
+                        <td>${s.service_date}</td>
+                        <td>${s.service_name}</td>
+                        <td>${s.reservation_code}</td>
+                        <td>${s.quantity}</td>
+                        <td>$${s.line_total}</td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="5">Error al cargar servicios.</td></tr>';
+            }
+        }
+
+        // --- DISPONIBILIDAD ---
+        async function searchRooms() {
+            const checkin = document.getElementById('search-checkin').value;
+            const checkout = document.getElementById('search-checkout').value;
+            const type = document.getElementById('search-type').value;
+
+            if (!checkin || !checkout) { alert("Selecciona fechas"); return; }
+
+            const el = document.getElementById('rooms-results');
+            el.innerHTML = '<p>Buscando...</p>';
+
+            try {
+                // Usamos el endpoint público de rooms, filtrando en cliente por ahora (o backend si existiera filtro)
+                // Idealmente backend debería filtrar por fecha, pero por ahora filtramos status 'disponible'
+                const resp = await fetchWithAuth('/api/rooms?status=disponible&per_page=100');
+                const result = await resp.json();
+                const allRooms = result.data || []; // Handle paginated response
+
+                const filtered = allRooms.filter(r => type === 'todos' || r.room_type === type);
+
+                if (filtered.length === 0) {
+                    el.innerHTML = '<p class="muted">No hay habitaciones disponibles con esos criterios.</p>';
+                    return;
+                }
+
+                el.innerHTML = filtered.map(r => `
+                    <div class="card" style="display:flex; justify-content:space-between; align-items:center; margin-top:10px">
+                        <div>
+                            <strong>Habitación ${r.room_num} (${r.room_type})</strong>
+                            <div class="muted">Capacidad: ${r.capacity} personas</div>
+                        </div>
+                        <div style="text-align:right">
+                            <div style="font-size:18px; font-weight:bold; color:var(--accent)">$${r.price}</div>
+                            <button onclick="openReserveModal(${r.room_id}, '${r.room_num}', '${r.price}')">Reservar</button>
+                        </div>
+                    </div>
+                `).join('');
+                currentRooms = filtered;
+            } catch (e) {
+                el.innerHTML = '<p class="danger">Error al buscar.</p>';
+            }
+        }
+
+        function openReserveModal(id, num, price) {
+            document.getElementById('res-room-id').value = id;
+            document.getElementById('res-room-info').textContent = `Hab. ${num} ($${price}/noche)`;
+            document.getElementById('res-dates-info').textContent =
+                `${document.getElementById('search-checkin').value} al ${document.getElementById('search-checkout').value}`;
+
+            document.getElementById('reserveModal').style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        async function confirmReservation() {
+            const payload = {
+                client_id: parseInt(clientId),
+                room_id: parseInt(document.getElementById('res-room-id').value),
+                checkin_date: document.getElementById('search-checkin').value,
+                checkout_date: document.getElementById('search-checkout').value,
+                guest_name: document.getElementById('res-guest-name').value,
+                guest_email: document.getElementById('res-guest-email').value,
+                guest_phone: document.getElementById('res-guest-phone').value
+            };
+
+            if (!payload.guest_name || !payload.guest_email) { alert("Nombre y Email obligatorios"); return; }
+
+            try {
+                const resp = await fetchWithAuth('/api/reservations', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                const j = await resp.json();
+
+                if (resp.ok) {
+                    alert("Reserva creada exitosamente!");
+                    closeModal('reserveModal');
+                    switchTab('reservas');
+                } else {
+                    alert("Error: " + j.error);
+                }
+            } catch (e) { alert("Error de conexión"); }
+        }
+
+        async function openServiceRequestModal(resId, resCode, checkin, checkout) {
+            document.getElementById('srv-req-res-id').value = resId;
+            document.getElementById('srv-req-res-code').textContent = resCode;
+            document.getElementById('srv-req-checkin').value = checkin;
+            document.getElementById('srv-req-checkout').value = checkout;
+
+            // Set default date to today or checkin if in the future
+            const today = new Date().toISOString().split('T')[0];
+            const checkInDate = checkin;
+            document.getElementById('srv-req-date').value = checkInDate > today ? checkInDate : today;
+            document.getElementById('srv-req-date').min = checkin;
+            document.getElementById('srv-req-date').max = checkout;
+
+            // Load available services
+            await loadServicesForRequest();
+
+            document.getElementById('serviceRequestModal').style.display = 'flex';
+        }
+
+        async function loadServicesForRequest() {
+            const select = document.getElementById('srv-req-service');
+            try {
+                const resp = await fetchWithAuth('/api/services?status=activo&per_page=100');
+                const result = await resp.json();
+                const services = result.data || [];
+
+                if (services.length === 0) {
+                    select.innerHTML = '<option value="">No hay servicios disponibles</option>';
+                    return;
+                }
+
+                select.innerHTML = services.map(s =>
+                    `<option value="${s.service_id}">${s.name} - $${s.price}</option>`
+                ).join('');
+            } catch (e) {
+                select.innerHTML = '<option value="">Error al cargar servicios</option>';
+            }
+        }
+
+        async function submitServiceRequest() {
+            const resId = document.getElementById('srv-req-res-id').value;
+            const serviceId = document.getElementById('srv-req-service').value;
+            const date = document.getElementById('srv-req-date').value;
+            const quantity = document.getElementById('srv-req-qty').value;
+
+            if (!serviceId || !date) {
+                alert("Por favor completa todos los campos");
+                return;
+            }
+
+            try {
+                const resp = await fetchWithAuth(`/api/reservations/${resId}/services`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        service_id: parseInt(serviceId),
+                        service_date: date,
+                        quantity: parseInt(quantity)
+                    })
+                });
+
+                const j = await resp.json();
+                if (resp.ok) {
+                    alert("Servicio solicitado exitosamente!");
+                    closeModal('serviceRequestModal');
+                    loadMyReservations(); // Refresh to show updated total
+                } else {
+                    alert("Error: " + j.error);
+                }
+            } catch (e) {
+                alert("Error de conexión");
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = './login.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login - Hotel R&G</title>
+  <style>
+    /* ... ESTILOS OMITIDOS POR BREVEDAD ... */
+    body { font-family: Arial, sans-serif; background: #f3f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .login-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 320px; }
+    input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+    button { width: 100%; padding: 10px; background: #2f9e65; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #258a55; }
+    .hint { margin-top: 15px; font-size: 12px; color: #6b7280; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <h2>Login - Hotel R&amp;G</h2>
+
+    <input type="email" id="email" placeholder="Correo electrónico" required />
+    <input type="password" id="password" placeholder="Contraseña" required />
+    <button id="btnLogin">Iniciar Sesión</button>
+
+    <div id="error" style="color: red; margin-top: 10px;"></div>
+    <div class="hint">Usar credenciales de la base de datos (Ej: admin@hotel.com / admin)</div>
+  </div>
+
+<script>
+document.getElementById('btnLogin').addEventListener('click', login);
+
+async function login(){
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const error = document.getElementById('error');
+  error.textContent = '';
+
+  if(!email || !password){ error.textContent = 'Completa todos los campos.'; return; }
+
+  const body = new FormData();
+  body.append('email', email);
+  body.append('password', password);
+
+  try {
+    const resp = await fetch('/api/login', { method: 'POST', body });
+    const j = await resp.json().catch(()=>({error:'Respuesta inválida'}));
+    
+    if(resp.ok){
+      const role = j.role;
+      localStorage.setItem('user_role', role);
+      
+      // Almacena client_id y redirige según el rol
+      if (j.client_id) {
+          localStorage.setItem('client_id', j.client_id);
+      } else {
+          localStorage.removeItem('client_id');
+      }
+
+      if(role === 'admin' || role === 'recepcion'){ 
+          window.location.href = './administrador.html'; 
+      } else if (role === 'spa') {
+          window.location.href = './empleado.html'; 
+      } else {
+          // Cliente
+          window.location.href = './cliente.html';
+      }
+    } else {
+      error.textContent = j.error || 'Credenciales incorrectas.';
+    }
+  } catch(e){
+    error.textContent = 'Error al conectar con el servidor.';
+    console.error(e);
+  }
+}
+</script>
+</body>
+</html>
