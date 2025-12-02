@@ -25,7 +25,7 @@ Sistema completo de gestión hotelera desarrollado con Flask y MySQL, que incluy
 - **Autenticación**: Sistema de login con roles diferenciados
 - **Protección de Rutas**: Control de acceso basado en roles
 
-## 🛠 Tecnologías
+## Tecnologías
 
 - **Backend**: Flask (Python 3.9)
 - **Base de Datos**: MySQL 8.0
