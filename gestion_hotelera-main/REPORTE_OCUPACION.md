@@ -1,12 +1,12 @@
 # Reporte de Ocupación - Cambios Implementados
 
-## ✅ Cambios Realizados
+## Cambios Realizados
 
 ### 1. **Reubicación del Reporte**
 **Antes**: El reporte de ocupación aparecía en el Dashboard  
 **Ahora**: El reporte está en la pestaña "Reportes" junto con otros reportes del sistema
 
-**Ubicación**: Admin Panel → 📈 Reportes → 📊 Reporte de Ocupación Hotelera
+**Ubicación**: Admin Panel → Reportes → Reporte de Ocupación Hotelera
 
 ---
 
@@ -14,10 +14,10 @@
 Ahora el reporte de ocupación se puede exportar como archivo CSV para análisis externo.
 
 **Características**:
-- ✅ Descarga con un solo clic
-- ✅ Nombre de archivo descriptivo: `ocupacion_YYYY-MM-DD_YYYY-MM-DD.csv`
-- ✅ Codificación UTF-8 con BOM para compatibilidad con Excel
-- ✅ Formato estándar CSV compatible con Excel, Google Sheets, etc.
+- Descarga con un solo clic
+- Nombre de archivo descriptivo: `ocupacion_YYYY-MM-DD_YYYY-MM-DD.csv`
+- Codificación UTF-8 con BOM para compatibilidad con Excel
+- Formato estándar CSV compatible con Excel, Google Sheets, etc.
 
 **Contenido del CSV**:
 ```csv
@@ -29,12 +29,12 @@ Fecha,Habitaciones Ocupadas,Total Habitaciones,Porcentaje de Ocupación (%)
 
 ---
 
-## 🎯 Cómo Usar el Reporte
+## Cómo Usar el Reporte
 
 ### Paso 1: Navegar a Reportes
 1. Iniciar sesión como **admin** o **recepción**
-2. Hacer clic en la pestaña "📈 Reportes" en el menú lateral
-3. Desplazarse hasta "📊 Reporte de Ocupación Hotelera"
+2. Hacer clic en la pestaña " Reportes" en el menú lateral
+3. Desplazarse hasta "Reporte de Ocupación Hotelera"
 
 ### Paso 2: Configurar Filtros
 - **Fecha Inicio**: Seleccionar la fecha de inicio del período
@@ -47,20 +47,20 @@ Fecha,Habitaciones Ocupadas,Total Habitaciones,Porcentaje de Ocupación (%)
 
 ### Paso 3: Generar Reporte
 **Opción A - Ver en Pantalla**:
-- Hacer clic en "📊 Ver Reporte"
+- Hacer clic en " Ver Reporte"
 - El reporte se muestra en una tabla con colores:
-  - 🔴 Rojo: Ocupación < 30%
-  - 🟠 Naranja: Ocupación 30-59%
-  - 🟢 Verde: Ocupación ≥ 60%
+  - Rojo: Ocupación < 30%
+  - Naranja: Ocupación 30-59%
+  - Verde: Ocupación ≥ 60%
 
 **Opción B - Descargar CSV**:
-- Hacer clic en "⬇️ Descargar CSV"
+- Hacer clic en "Descargar CSV"
 - El archivo se descarga automáticamente
 - Abrir con Excel, Google Sheets, o cualquier visor de CSV
 
 ---
 
-## 📊 Estructura del Reporte
+##  Estructura del Reporte
 
 ### Datos Incluidos
 - **Fecha**: Cada día del período seleccionado
@@ -75,7 +75,7 @@ Fecha,Habitaciones Ocupadas,Total Habitaciones,Porcentaje de Ocupación (%)
 
 ---
 
-## 🔧 Archivos Modificados
+##  Archivos Modificados
 
 | Archivo | Cambios |
 |---------|---------|
@@ -84,7 +84,7 @@ Fecha,Habitaciones Ocupadas,Total Habitaciones,Porcentaje de Ocupación (%)
 
 ---
 
-## 📝 Notas Técnicas
+##  Notas Técnicas
 
 ### Encoding del CSV
 - El archivo CSV usa `charset=utf-8-sig` (UTF-8 con BOM)
@@ -103,7 +103,7 @@ Content-Disposition: attachment; filename=ocupacion_2025-12-01_2025-12-31.csv
 
 ---
 
-## ✨ Casos de Uso
+##  Casos de Uso
 
 ### 1. Análisis Mensual
 - Seleccionar primer y último día del mes
@@ -122,9 +122,7 @@ Content-Disposition: attachment; filename=ocupacion_2025-12-01_2025-12-31.csv
 - Exportar datos del trimestre
 - Crear gráficas en Excel para presentaciones
 
----
 
-## 🚀 Próximas Mejoras Sugeridas
 
 - [ ] Gráfica visual (chart.js) dentro del reporte HTML
 - [ ] Exportar a PDF adicional a CSV
