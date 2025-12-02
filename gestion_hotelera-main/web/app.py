@@ -19,7 +19,7 @@ DB_NAME = os.environ.get("DB_NAME", "gestion_hotelera")
 # Tipos de roles soportados
 ROLES = ['admin', 'cliente', 'spa', 'recepcion']
 
-# 🔥 FORZAR UTF-8 EN TODAS LAS RESPUESTAS JSON
+# FORZAR UTF-8 EN TODAS LAS RESPUESTAS JSON
 @app.after_request
 def after_request(response):
     if response.content_type and 'application/json' in response.content_type:
@@ -33,7 +33,7 @@ def get_conn():
                            charset='utf8mb4',     # Mantenemos este parámetro
                            use_unicode=True)      # Y este
 
-    # 🚨 PASO CRÍTICO: Forzar el juego de caracteres después de la conexión
+    #  PASO CRÍTICO: Forzar el juego de caracteres después de la conexión
     with conn.cursor() as cur:
         cur.execute("SET NAMES 'utf8mb4'")
         
